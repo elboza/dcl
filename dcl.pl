@@ -5,8 +5,15 @@ use Getopt::Long;
 package dcl;
 	$VERSION="0.1";
 	$VERBOSE=0;
+	$EJECT=0;
+	$UMOUNT=0;
+	$OVERRIDE=0;
+	$FILELIST="";
+	$NOREC=0;
+	$PRETEND=0;
 package main;
 
+@rm_files=(".DS_Store","._.DS_Store",".Spotlight-V100","prova.dcl",'\.o$');
 sub show_version{
 	print "dcl v$dcl::VERSION\n";
 }
@@ -59,17 +66,16 @@ sub opt_help_handler{
 	if($opt_value =~ /config/)
 	{
 		show_config_usage;
-		print "help option: $opt_value\n";
+		
 	}
 	else
 	{
 		show_usage;
-		print "no help value\n";
 	}
 }
 sub p_verbose{
 	return if($dcl::VERBOSE==0);
-	print @_ , "\n";
+	print @_ ;
 }
 
 sub clean{
@@ -77,8 +83,12 @@ sub clean{
 	opendir(DIR,$dir) or die $!;
 	my @files=readdir(DIR);
 	closedir(DIR);
-	foreach my $i (@files) {
-		print ":: $i\n"
+	foreach $file (@files) {
+		p_verbose(":: $file");
+		if(grep {$file =~ /$_/} @rm_files){
+			p_verbose "	<<<<";
+		}
+		p_verbose("\n");
 	}
 }
 
@@ -87,10 +97,10 @@ sub main {
 	my $len=23;
 	GetOptions( 'help|h:s' => \&opt_help_handler,
 				'version|v' => \&opt_version_handler,
-				'verbose|vv' => \$dcl::VERBOSE
+				'verbose|show|vv|s' => \$dcl::VERBOSE
 			) or die ("Error in command line arguments");
 	$dir=shift @ARGV || die("dir-path missing.");
-	p_verbose("dir-path: $dir");
+	p_verbose("dir-path: $dir\n");
 	clean $dir;
 
 }
