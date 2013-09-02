@@ -91,24 +91,39 @@ sub p_show{
 sub clean{
 	my $dir=shift @_;
     local $dcl::VERBOSE=shift @_;
-    my @rm_files=shift @_;
+    my @rm_files=@_;
 	opendir(DIR,$dir) or die $!;
 	my @files=grep { !/^\.{1,2}$/ } readdir(DIR);
 	closedir(DIR);
     if(!$dcl::NOREC){
-       @dirs=grep { -d $_ } map{$dir . '/' . $_ } @files;
-       print "subdir founded: @dirs\n";
-       foreach $subdir (@dirs){
-            p_verbose("dir founded: $subdir\n");
-            clean ($subdir,$dcl::VERBOSE,@rm_files);
+       my @dirs=grep { -d $_ } map{$dir . '/' . $_ } @files;
+       #p_verbose "dirlist: @dirs\n";
+       foreach my $subdir (@dirs){
+			clean ($subdir,$dcl::VERBOSE,@rm_files);
        }
     }
-    p_verbose("in dir: $dir ...\n");
-	foreach $file (@files) {
+    my $str=">> in dir: $dir #with @rm_files\n";
+    p_verbose($str);
+    p_show($str);
+	foreach my $file (@files) {
 		p_verbose(":: $file");
         p_verbose("/") if (-d "$dir/$file");
 		if(grep {$file =~ /$_/} @rm_files){
 			p_verbose "	<<<<";
+			p_show(":: $file");
+			p_show("/") if (-d "$dir/$file");
+			p_show(" \t<<<<");
+			#perform deletion
+			if(!$dcl::PRETEND){
+				if(-d "$dir/$file"){
+					clean("$dir/$file",0,'\.*');
+					rmdir "$dir/$file";
+				}
+				else{
+					unlink "$dir/$file";
+				}
+			}
+			p_show("\n");
 		}
 		p_verbose("\n");
 	}
@@ -133,7 +148,7 @@ sub main {
 	$dir=shift @ARGV || die("ARGV error. dir-path missing.");
     $dcl::SHOW=0 if($dcl::VERBOSE);  #show is a subset of verbose.
 	p_verbose("dir-path: $dir\n");
-	clean $dir,$dcl::VERBOSE,@rm_files;
+	clean ($dir,$dcl::VERBOSE,@rm_files);
 
 }
 
