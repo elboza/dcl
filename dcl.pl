@@ -12,6 +12,10 @@ package dcl;
 	$FILELIST="";
 	$NOREC=0;
 	$PRETEND=0;
+    $SHOW=0;
+    $ASK=0;
+    $FILTER="";
+    $LANG="regex";
 package main;
 
 @rm_files=(".DS_Store","._.DS_Store",".Spotlight-V100","prova.dcl",'\.o$');
@@ -21,7 +25,7 @@ sub show_version{
 sub show_usage{
 	show_version;
 	print <<EOF;
-by Fernando Iazeolla, iazasoft, 2013 ©
+by Fernando Iazeolla, iazasoft, 2013 (c)
 this software is distributed under GPLv2 licence.
 
 USAGE: dcl [ OPTIONS ] dir-path
@@ -41,7 +45,7 @@ and OPTIONS are:
 --pretend	-p		#do not perform deletion.
 --ask		-i [-a]	#ask confirmation before deleting each
 --filter	-x		#define files filter to be deleted on command line. 
-
+--lang [regex|glob] -l [regex|glob] #set parser language.
 EOF
 
 	exit(1);
@@ -66,7 +70,7 @@ sub opt_version_handler{
 sub opt_help_handler{
 	my ($opt_name,$opt_value)=@_;
 	#print ",,$opt_name,, ;;$opt_value;;\n";
-	if($opt_value =~ /config/)
+	if($opt_value eq "config")
 	{
 		show_config_usage;
 		
@@ -77,17 +81,33 @@ sub opt_help_handler{
 	}
 }
 sub p_verbose{
-	return if($dcl::VERBOSE==0);
+	return if(!$dcl::VERBOSE);
 	print @_ ;
 }
-
+sub p_show{
+    return if(!$dcl::SHOW);
+    print @_ ;
+}
 sub clean{
 	my $dir=shift @_;
+    local $dcl::VERBOSE=shift @_;
+    my @rm_files=shift @_;
 	opendir(DIR,$dir) or die $!;
-	my @files=readdir(DIR);
+	my @files=grep { !/^\.{1,2}$/ } readdir(DIR);
 	closedir(DIR);
+    if(!$dcl::NOREC){
+       @dirs=map{$dir . '/' . $_ }grep { -d $_ } @files;
+       print "subdir founded: @dirs\n";
+       foreach $subdir (@dirs){
+            #next if /./ ;
+            p_verbose("dir founded: $subdir\n");
+            clean ($subdir,$dcl::VERBOSE,@rm_files);
+       }
+    }
+    p_verbose("in dir: $dir ...\n");
 	foreach $file (@files) {
 		p_verbose(":: $file");
+        p_verbose("/") if (-d "$dir/$file");
 		if(grep {$file =~ /$_/} @rm_files){
 			p_verbose "	<<<<";
 		}
@@ -99,11 +119,22 @@ sub main {
 	my $dir='.';
 	GetOptions( 'help|h:s' => \&opt_help_handler,
 				'version|v' => \&opt_version_handler,
-				'verbose|show|vv|s' => \$dcl::VERBOSE
+				'verbose|vv' => \$dcl::VERBOSE,
+                'show|s' => \$dcl::SHOW,
+                'ask|a|i' => \$dcl::ASK,
+                'pretend|p' => \$dcl::PRETEND,
+                'override|O' => \$dcl::OVERRIDE,
+                'norec|R' => \$dcl::NOREC,
+                'eject|e' => \$dcl::EJECT,
+                'umount|u' => \$dcl::UMOUNT,
+                'filter|x=s' => \$dcl::FILTER,
+                'filelist|f=s' => \$dcl::FILELIST,
+                'lang|l=s' => \$dcl::LANG
 			) or die ("Error in command line arguments");
-	$dir=shift @ARGV || die("dir-path missing.");
+	$dir=shift @ARGV || die("ARGV error. dir-path missing.");
+    $dcl::SHOW=0 if($dcl::VERBOSE);  #show is a subset of verbose.
 	p_verbose("dir-path: $dir\n");
-	clean $dir;
+	clean $dir,$dcl::VERBOSE,@rm_files;
 
 }
 
