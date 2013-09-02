@@ -1,6 +1,7 @@
 #!/usr/bin/perl -w
 
 use Getopt::Long;
+#use Text::Glob qw( match_glob glob_to_regex ); #my $regex=glob_to_regex("foo.*");
 
 package dcl;
 	$VERSION="0.1";
@@ -36,8 +37,10 @@ and OPTIONS are:
 --filelist	-f		#specity a custom file list
 --norec		-R		#not recursive thru sub dirs
 --verbose	-vv		#verbose output
---show		-s		#same as --verbose
---pretend	-p		#do not perform deletion. 
+--show		-s		#show matching files to be deleted
+--pretend	-p		#do not perform deletion.
+--ask		-i [-a]	#ask confirmation before deleting each
+--filter	-x		#define files filter to be deleted on command line. 
 
 EOF
 
@@ -94,7 +97,6 @@ sub clean{
 
 sub main {
 	my $dir='.';
-	my $len=23;
 	GetOptions( 'help|h:s' => \&opt_help_handler,
 				'version|v' => \&opt_version_handler,
 				'verbose|show|vv|s' => \$dcl::VERBOSE
