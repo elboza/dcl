@@ -96,10 +96,9 @@ sub clean{
 	my @files=grep { !/^\.{1,2}$/ } readdir(DIR);
 	closedir(DIR);
     if(!$dcl::NOREC){
-       @dirs=map{$dir . '/' . $_ }grep { -d $_ } @files;
+       @dirs=grep { -d $_ } map{$dir . '/' . $_ } @files;
        print "subdir founded: @dirs\n";
        foreach $subdir (@dirs){
-            #next if /./ ;
             p_verbose("dir founded: $subdir\n");
             clean ($subdir,$dcl::VERBOSE,@rm_files);
        }
