@@ -12,10 +12,10 @@ package dcl;
 	$FILELIST="";
 	$NOREC=0;
 	$PRETEND=0;
-    $SHOW=0;
-    $ASK=0;
-    $FILTER="";
-    $LANG="regex";
+	$SHOW=0;
+	$ASK=0;
+	$FILTER="";
+	$LANG="regex";
 package main;
 
 @rm_files=(".DS_Store","._.DS_Store",".Spotlight-V100","prova.dcl",'\.o$');
@@ -85,17 +85,17 @@ sub p_verbose{
 	print @_ ;
 }
 sub p_show{
-    return if(!$dcl::SHOW);
-    print @_ ;
+	return if(!$dcl::SHOW);
+	print @_ ;
 }
 sub clean{
 	my $dir=shift @_;
-    local $dcl::VERBOSE=shift @_;
-    my @rm_files=@_;
+	local $dcl::VERBOSE=shift @_;
+	my @rm_files=@_;
 	opendir(DIR,$dir) or die $!;
 	my @files=grep { !/^\.{1,2}$/ } readdir(DIR);
 	closedir(DIR);
-    if(!$dcl::NOREC){
+	if(!$dcl::NOREC){
        my @dirs=grep { -d $_ } map{$dir . '/' . $_ } @files;
        #p_verbose "dirlist: @dirs\n";
        foreach my $subdir (@dirs){
@@ -107,14 +107,27 @@ sub clean{
     p_show($str);
 	foreach my $file (@files) {
 		p_verbose(":: $file");
-        p_verbose("/") if (-d "$dir/$file");
+		p_verbose("/") if (-d "$dir/$file");
 		if(grep {$file =~ /$_/} @rm_files){
-			p_verbose "	<<<<";
+			p_verbose "	<<<< ";
 			p_show(":: $file");
 			p_show("/") if (-d "$dir/$file");
-			p_show(" \t<<<<");
+			p_show(" \t<<<< ");
 			#perform deletion
 			if(!$dcl::PRETEND){
+				if($dcl::ASK){
+					print "remove ";
+					if($dcl::VERBOSE || $dcl::SHOW)
+					{
+						print "it? ";
+					}
+					else
+					{
+						print "$file? ";
+					}
+					my $xx=lc <STDIN>;chomp $xx;
+					next if($xx ne "y" && $xx ne "yes");
+				}
 				if(-d "$dir/$file"){
 					clean("$dir/$file",0,'\.*');
 					rmdir "$dir/$file";
@@ -122,6 +135,8 @@ sub clean{
 				else{
 					unlink "$dir/$file";
 				}
+				p_show(" deleted.");
+				p_verbose(" deleted.");
 			}
 			p_show("\n");
 		}
@@ -146,11 +161,11 @@ sub main {
                 'lang|l=s' => \$dcl::LANG
 			) or die ("Error in command line arguments");
 	$dir=shift @ARGV || die("ARGV error. dir-path missing.");
-    $dcl::SHOW=0 if($dcl::VERBOSE);  #show is a subset of verbose.
-    @rm_files=() if($dcl::OVERRIDE);
-    if($dcl::FILTER ne ""){
-    	push @rm_files,split /[ :,;]/,$dcl::FILTER ;
-    }
+	$dcl::SHOW=0 if($dcl::VERBOSE);  #show is a subset of verbose.
+	@rm_files=() if($dcl::OVERRIDE);
+	if($dcl::FILTER ne ""){
+		push @rm_files,split /[ :,;]/,$dcl::FILTER ;
+	}
 	p_verbose("dir-path: $dir\n");
 	clean ($dir,$dcl::VERBOSE,@rm_files);
 
