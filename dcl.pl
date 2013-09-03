@@ -147,6 +147,10 @@ sub main {
 			) or die ("Error in command line arguments");
 	$dir=shift @ARGV || die("ARGV error. dir-path missing.");
     $dcl::SHOW=0 if($dcl::VERBOSE);  #show is a subset of verbose.
+    @rm_files=() if($dcl::OVERRIDE);
+    if($dcl::FILTER ne ""){
+    	push @rm_files,split /[ :,;]/,$dcl::FILTER ;
+    }
 	p_verbose("dir-path: $dir\n");
 	clean ($dir,$dcl::VERBOSE,@rm_files);
 
