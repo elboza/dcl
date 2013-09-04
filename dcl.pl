@@ -1,24 +1,29 @@
 #!/usr/bin/perl -w
 
 use Getopt::Long;
+use strict;
 #use Text::Glob qw( match_glob glob_to_regex ); #my $regex=glob_to_regex("foo.*");
+# noooo, don't want to install external modules !!! i will hard code what i need !!!
 
 package dcl;
-	$VERSION="0.1";
-	$VERBOSE=0;
-	$EJECT=0;
-	$UMOUNT=0;
-	$OVERRIDE=0;
-	$FILELIST="";
-	$NOREC=0;
-	$PRETEND=0;
-	$SHOW=0;
-	$ASK=0;
-	$FILTER="";
-	$LANG="regex";
+	$dcl::VERSION="0.1";
+	$dcl::VERBOSE=0;
+	$dcl::EJECT=0;
+	$dcl::UMOUNT=0;
+	$dcl::OVERRIDE=0;
+	$dcl::FILELIST="";
+	$dcl::NOREC=0;
+	$dcl::PRETEND=0;
+	$dcl::SHOW=0;
+	$dcl::ASK=0;
+	$dcl::FILTER="";
+	$dcl::LANG="regex";
 package main;
 
-@rm_files=(".DS_Store","._.DS_Store",".Spotlight-V100","prova.dcl",'\.o$');
+#@rm_files=(".DS_Store","._.DS_Store",".Spotlight-V100","foobar.dcl",'\.o$'); ##EXAMPLE
+@::rm_files=(".DS_Store","._.DS_Store",".Spotlight-V100");
+@::languages=("regex","glob");
+
 sub show_version{
 	print "dcl v$dcl::VERSION\n";
 }
@@ -96,20 +101,20 @@ sub clean{
 	my @files=grep { !/^\.{1,2}$/ } readdir(DIR);
 	closedir(DIR);
 	if(!$dcl::NOREC){
-       my @dirs=grep { -d $_ } map{$dir . '/' . $_ } @files;
-       #p_verbose "dirlist: @dirs\n";
-       foreach my $subdir (@dirs){
+		my @dirs=grep { -d $_ } map{$dir . '/' . $_ } @files;
+	foreach my $subdir (@dirs){
 			clean ($subdir,$dcl::VERBOSE,@rm_files);
-       }
-    }
-    my $str=">> in dir: $dir #with @rm_files\n";
-    p_verbose($str);
-    p_show($str);
+		}
+	}
+	my $str=">> in dir: $dir #with @rm_files\n";
+	p_verbose($str);
+	my $count=0;
 	foreach my $file (@files) {
 		p_verbose(":: $file");
 		p_verbose("/") if (-d "$dir/$file");
 		if(grep {$file =~ /$_/} @rm_files){
 			p_verbose "	<<<< ";
+			if(!$count){$count++;p_show(">> in dir: $dir\n");}
 			p_show(":: $file");
 			p_show("/") if (-d "$dir/$file");
 			p_show(" \t<<<< ");
@@ -162,12 +167,13 @@ sub main {
 			) or die ("Error in command line arguments");
 	$dir=shift @ARGV || die("ARGV error. dir-path missing.");
 	$dcl::SHOW=0 if($dcl::VERBOSE);  #show is a subset of verbose.
-	@rm_files=() if($dcl::OVERRIDE);
+	@::rm_files=() if($dcl::OVERRIDE);
 	if($dcl::FILTER ne ""){
-		push @rm_files,split /[ :,;]/,$dcl::FILTER ;
+		push @::rm_files,split /[ :,;]/,$dcl::FILTER ;
 	}
 	p_verbose("dir-path: $dir\n");
-	clean ($dir,$dcl::VERBOSE,@rm_files);
+	#p_show("with filter: @::rm_files\n");
+	clean ($dir,$dcl::VERBOSE,@::rm_files);
 
 }
 
