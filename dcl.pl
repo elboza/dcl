@@ -22,7 +22,8 @@ package main;
 
 #@rm_files=(".DS_Store","._.DS_Store",".Spotlight-V100","foobar.dcl",'\.o$'); ##EXAMPLE
 @::rm_files=(".DS_Store","._.DS_Store",".Spotlight-V100");
-@::languages=("regex","glob");
+#@::languages=("regex","glob");
+@::config_file_list=("/etc/dclrc","~/.dclrc");
 
 sub show_version{
 	print "dcl v$dcl::VERSION\n";
@@ -84,6 +85,40 @@ sub opt_help_handler{
 	{
 		show_usage;
 	}
+}
+sub read_config_file{
+	my $cfg_file=shift @_;
+	my @rm_files=();
+	my @xx=glob "$cfg_file";
+	my $xfile=shift @xx;
+	my $ll="";
+	#print "-- $cfg_file\n";
+	return @rm_files if( ! -e $xfile );
+	print "CFG: $xfile\n" if($dcl::VERBOSE);
+	open FD,"<$xfile" or return @rm_files;
+	my @lines=<FD>;
+	close FD;
+	#print @lines; # -----------
+	foreach $ll (@lines){
+		next if($ll=~/^\#/);
+		next if($ll=~/^\n/);
+		$ll=~ s/#.*\n$//g;
+		$ll=~ s/[\s\n\r\t]+//g;
+		if($ll=~/^%lang:/){
+			if($' eq "regex" || $' eq "glob"){
+				$dcl::LANG=$';
+			}
+			else
+			{
+				warn("invalid parsing language declaration on config file. Using default.\n");
+			}
+			next;
+		}
+		push @rm_files,$ll;
+		
+	}
+	#print @rm_files;
+	return @rm_files;
 }
 sub p_verbose{
 	return if(!$dcl::VERBOSE);
@@ -151,6 +186,8 @@ sub clean{
 
 sub main {
 	my $dir='.';
+	my $lang="";
+	my @rm_filter=();
 	GetOptions( 'help|h:s' => \&opt_help_handler,
 				'version|v' => \&opt_version_handler,
 				'verbose|vv' => \$dcl::VERBOSE,
@@ -163,17 +200,29 @@ sub main {
                 'umount|u' => \$dcl::UMOUNT,
                 'filter|x=s' => \$dcl::FILTER,
                 'filelist|f=s' => \$dcl::FILELIST,
-                'lang|l=s' => \$dcl::LANG
+                'lang|l=s' => \$lang
 			) or die ("Error in command line arguments");
 	$dir=shift @ARGV || die("ARGV error. dir-path missing.");
 	$dcl::SHOW=0 if($dcl::VERBOSE);  #show is a subset of verbose.
-	@::rm_files=() if($dcl::OVERRIDE);
+	@rm_filter=@::rm_files if(!$dcl::OVERRIDE);
+	foreach  (@::config_file_list) {
+		push @rm_filter,read_config_file($_);
+	}
+	if($lang ne ""){	#last word at command line !
+		if($lang eq "regex" || $lang eq "glob"){
+				$dcl::LANG=$lang;
+		}
+		else
+		{
+			warn("invalid language type. Using default.\n");
+		}
+	}
 	if($dcl::FILTER ne ""){
 		push @::rm_files,split /[ :,;]/,$dcl::FILTER ;
 	}
 	p_verbose("dir-path: $dir\n");
 	#p_show("with filter: @::rm_files\n");
-	clean ($dir,$dcl::VERBOSE,@::rm_files);
+	clean ($dir,$dcl::VERBOSE,@rm_filter);
 
 }
 
