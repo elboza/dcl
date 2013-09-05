@@ -1,28 +1,30 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
+use warnings;
 use Getopt::Long;
 use strict;
 #use Text::Glob qw( match_glob glob_to_regex ); #my $regex=glob_to_regex("foo.*");
 # noooo, don't want to install external modules !!! i will hard code what i need !!!
 
+%::languages=(regex=>"regex",glob=>"glob");
 package dcl;
 	$dcl::VERSION="0.1";
 	$dcl::VERBOSE=0;
 	$dcl::EJECT=0;
 	$dcl::UMOUNT=0;
 	$dcl::OVERRIDE=0;
-	$dcl::FILELIST="";
+	$dcl::FILELIST=undef;
 	$dcl::NOREC=0;
 	$dcl::PRETEND=0;
 	$dcl::SHOW=0;
 	$dcl::ASK=0;
-	$dcl::FILTER="";
-	$dcl::LANG=$::languages{regex};
+	$dcl::FILTER=undef;
+	$dcl::LANG=$main::languages{regex};
+	$dcl::QUIET=0;
 package main;
 
 #@rm_files=(".DS_Store","._.DS_Store",".Spotlight-V100","foobar.dcl",'\.o$'); ##EXAMPLE
 @::rm_files=(".DS_Store","._.DS_Store",".Spotlight-V100");
-%::languages=(regex=>"regex",glob=>"glob");
 @::config_file_list=("/etc/dclrc","~/.dclrc");
 
 sub show_version{
@@ -43,25 +45,31 @@ and OPTIONS are:
 --version	-v		#show program version
 --eject		-e		#eject volume after cleaned
 --umount	-u		#unmount volume after cleaned.
---override	-O		#exclude the default built-in file list
+--override	-o		#exclude the default built-in file list
 --filelist	-f		#specity a custom file list
---norec		-R		#not recursive thru sub dirs
+--norec		-r		#not recursive thru sub dirs
 --verbose	-vv		#verbose output
 --show		-s		#show matching files to be deleted
 --pretend	-p		#do not perform deletion.
 --ask		-i [-a]	#ask confirmation before deleting each
 --filter	-x		#define files filter to be deleted on command line. 
 --lang [regex|glob] -l [regex|glob] #set parser language.
+--quiet		-q		#quiet output.
 EOF
 
 	exit(1);
 }
 sub show_config_usage{
 	print <<EOF;
-you can customize the file list to be deleted by editing config files [/etc/dclrc , ~/.dclrc] or a custom file using the -f option. default built-in file list is always read unless you use the --override option.
+you can customize the file list to be deleted by editing config files 
+[/etc/dclrc , ~/.dclrc] 
+or a custom file using the -f option. 
+default built-in filter list is always read unless you use the --override option.
 
 dcl.rc example:
-	*.o		#all object files
+	
+	%lang:glob 	#use glob syntax instead of regex
+	*.o		#all object files (glob syntax)
 	.DS_Dtore	#osx stuff !!
 	Makefile.in
 	#this is a comment
@@ -96,8 +104,7 @@ sub lang_filter{
 			if($letter eq "*")
 			{
 				$regex .="[^/]*";
-			}
-			if ($letter =~ /[\{\}\.\+\(\)\[\]]/) {
+			} elsif ($letter =~ /[\{\}\.\+\(\)\[\]]/) {
 				$regex .= "\\$letter";
 			} elsif ($letter eq "?") {
 				$regex .= ".";
@@ -107,12 +114,9 @@ sub lang_filter{
 				$regex .= $letter;
 			}
 		}
-		print "$regex\n";
 		$regex="^$regex\$";
-		print "$regex\n";
 		push @filtered_list,$regex;
 	}
-	print "@filtered_list\n";
 	return @filtered_list;
 }
 sub read_config_file{
@@ -215,7 +219,7 @@ sub clean{
 
 sub main {
 	my $dir='.';
-	my $lang="";
+	my $lang=undef;
 	my @rm_filter=();
 	GetOptions( 'help|h:s' => \&opt_help_handler,
 				'version|v' => \&opt_version_handler,
@@ -229,16 +233,18 @@ sub main {
                 'umount|u' => \$dcl::UMOUNT,
                 'filter|x=s' => \$dcl::FILTER,
                 'filelist|f=s' => \$dcl::FILELIST,
-                'lang|l=s' => \$lang
+                'lang|l=s' => \$lang,
+                'quiet|q'=> \$dcl::QUIET
 			) or die ("Error in command line arguments");
 	$dir=shift @ARGV || die("ARGV error. dir-path missing.");
 	$dcl::SHOW=0 if($dcl::VERBOSE);  #show is a subset of verbose.
+	if($dcl::QUIET){$dcl::SHOW=0;$dcl::VERBOSE=0;}	#quiet wins !
 	@rm_filter=@::rm_files if(!$dcl::OVERRIDE);
 	foreach  (@::config_file_list) {
-		push @rm_filter,read_config_file($_);
+		push @rm_filter,lang_filter(read_config_file($_));
 	}
-	push @rm_filter,lang_filter(read_config_file($dcl::FILELIST)) if($dcl::FILELIST ne "");
-	if($lang ne ""){	#last word at command line !
+	push @rm_filter,lang_filter(read_config_file($dcl::FILELIST)) if($dcl::FILELIST);
+	if($lang){	#last word at command line !
 		if($lang eq $::languages{regex} || $lang eq $::languages{glob}){
 				$dcl::LANG=$lang;
 		}
@@ -247,13 +253,17 @@ sub main {
 			warn("invalid language type. Using default.\n");
 		}
 	}
-	if($dcl::FILTER ne ""){
-		push @::rm_files,lang_filter(split /[ :,;]/,$dcl::FILTER) ;
+	if($dcl::FILTER){
+		push @rm_filter,lang_filter(split /[ :,;]/,$dcl::FILTER) ;
 	}
 	p_verbose("dir-path: $dir\n");
 	#p_show("with filter: @::rm_files\n");
 	clean ($dir,$dcl::VERBOSE,@rm_filter);
-
+	print"Ok.\n" unless $dcl::QUIET;
+	if($dcl::EJECT || $dcl::UMOUNT){
+		print "umount && eject not yet coded... be patient :)\n" unless $dcl::QUIET;
+	}
+	
 }
 
 main;
