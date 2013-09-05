@@ -17,12 +17,12 @@ package dcl;
 	$dcl::SHOW=0;
 	$dcl::ASK=0;
 	$dcl::FILTER="";
-	$dcl::LANG="regex";
+	$dcl::LANG=$::languages{regex};
 package main;
 
 #@rm_files=(".DS_Store","._.DS_Store",".Spotlight-V100","foobar.dcl",'\.o$'); ##EXAMPLE
 @::rm_files=(".DS_Store","._.DS_Store",".Spotlight-V100");
-#@::languages=("regex","glob");
+%::languages=(regex=>"regex",glob=>"glob");
 @::config_file_list=("/etc/dclrc","~/.dclrc");
 
 sub show_version{
@@ -86,6 +86,35 @@ sub opt_help_handler{
 		show_usage;
 	}
 }
+sub lang_filter{
+	my @filter_list=@_;
+	my @filtered_list=();
+	return @filter_list if($dcl::LANG ne $::languages{glob});
+	foreach my $filter_item (@filter_list){
+		my $regex=undef;
+		foreach my $letter (split(//,$filter_item)){
+			if($letter eq "*")
+			{
+				$regex .="[^/]*";
+			}
+			if ($letter =~ /[\{\}\.\+\(\)\[\]]/) {
+				$regex .= "\\$letter";
+			} elsif ($letter eq "?") {
+				$regex .= ".";
+			} elsif ($letter eq '\\') {
+				$regex .= "/";
+			} else {
+				$regex .= $letter;
+			}
+		}
+		print "$regex\n";
+		$regex="^$regex\$";
+		print "$regex\n";
+		push @filtered_list,$regex;
+	}
+	print "@filtered_list\n";
+	return @filtered_list;
+}
 sub read_config_file{
 	my $cfg_file=shift @_;
 	my @rm_files=();
@@ -105,7 +134,7 @@ sub read_config_file{
 		$ll=~ s/#.*\n$//g;
 		$ll=~ s/[\s\n\r\t]+//g;
 		if($ll=~/^%lang:/){
-			if($' eq "regex" || $' eq "glob"){
+			if($' eq $::languages{regex} || $' eq $::languages{glob}){
 				$dcl::LANG=$';
 			}
 			else
@@ -208,8 +237,9 @@ sub main {
 	foreach  (@::config_file_list) {
 		push @rm_filter,read_config_file($_);
 	}
+	push @rm_filter,lang_filter(read_config_file($dcl::FILELIST)) if($dcl::FILELIST ne "");
 	if($lang ne ""){	#last word at command line !
-		if($lang eq "regex" || $lang eq "glob"){
+		if($lang eq $::languages{regex} || $lang eq $::languages{glob}){
 				$dcl::LANG=$lang;
 		}
 		else
@@ -218,7 +248,7 @@ sub main {
 		}
 	}
 	if($dcl::FILTER ne ""){
-		push @::rm_files,split /[ :,;]/,$dcl::FILTER ;
+		push @::rm_files,lang_filter(split /[ :,;]/,$dcl::FILTER) ;
 	}
 	p_verbose("dir-path: $dir\n");
 	#p_show("with filter: @::rm_files\n");
