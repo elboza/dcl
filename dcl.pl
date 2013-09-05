@@ -83,7 +83,6 @@ sub opt_version_handler{
 }
 sub opt_help_handler{
 	my ($opt_name,$opt_value)=@_;
-	#print ",,$opt_name,, ;;$opt_value;;\n";
 	if($opt_value eq "config")
 	{
 		show_config_usage;
@@ -125,13 +124,11 @@ sub read_config_file{
 	my @xx=glob "$cfg_file";
 	my $xfile=shift @xx;
 	my $ll="";
-	#print "-- $cfg_file\n";
 	return @rm_files if( ! -e $xfile );
 	print "CFG: $xfile\n" if($dcl::VERBOSE);
 	open FD,"<$xfile" or return @rm_files;
 	my @lines=<FD>;
 	close FD;
-	#print @lines; # -----------
 	foreach $ll (@lines){
 		next if($ll=~/^\#/);
 		next if($ll=~/^\n/);
@@ -150,7 +147,6 @@ sub read_config_file{
 		push @rm_files,$ll;
 		
 	}
-	#print @rm_files;
 	return @rm_files;
 }
 sub p_verbose{
@@ -170,7 +166,7 @@ sub clean{
 	closedir(DIR);
 	if(!$dcl::NOREC){
 		my @dirs=grep { -d $_ } map{$dir . '/' . $_ } @files;
-	foreach my $subdir (@dirs){
+		foreach my $subdir (@dirs){
 			clean ($subdir,$dcl::VERBOSE,@rm_files);
 		}
 	}
@@ -222,20 +218,20 @@ sub main {
 	my $lang=undef;
 	my @rm_filter=();
 	GetOptions( 'help|h:s' => \&opt_help_handler,
-				'version|v' => \&opt_version_handler,
-				'verbose|vv' => \$dcl::VERBOSE,
-                'show|s' => \$dcl::SHOW,
-                'ask|a|i' => \$dcl::ASK,
-                'pretend|p' => \$dcl::PRETEND,
-                'override|O' => \$dcl::OVERRIDE,
-                'norec|R' => \$dcl::NOREC,
-                'eject|e' => \$dcl::EJECT,
-                'umount|u' => \$dcl::UMOUNT,
-                'filter|x=s' => \$dcl::FILTER,
-                'filelist|f=s' => \$dcl::FILELIST,
-                'lang|l=s' => \$lang,
-                'quiet|q'=> \$dcl::QUIET
-			) or die ("Error in command line arguments");
+		'version|v' => \&opt_version_handler,
+		'verbose|vv' => \$dcl::VERBOSE,
+		'show|s' => \$dcl::SHOW,
+		'ask|a|i' => \$dcl::ASK,
+		'pretend|p' => \$dcl::PRETEND,
+		'override|O' => \$dcl::OVERRIDE,
+		'norec|R' => \$dcl::NOREC,
+		'eject|e' => \$dcl::EJECT,
+		'umount|u' => \$dcl::UMOUNT,
+		'filter|x=s' => \$dcl::FILTER,
+		'filelist|f=s' => \$dcl::FILELIST,
+		'lang|l=s' => \$lang,
+		'quiet|q'=> \$dcl::QUIET
+		) or die ("Error in command line arguments");
 	$dir=shift @ARGV || die("ARGV error. dir-path missing.");
 	$dcl::SHOW=0 if($dcl::VERBOSE);  #show is a subset of verbose.
 	if($dcl::QUIET){$dcl::SHOW=0;$dcl::VERBOSE=0;}	#quiet wins !
@@ -257,7 +253,6 @@ sub main {
 		push @rm_filter,lang_filter(split /[ :,;]/,$dcl::FILTER) ;
 	}
 	p_verbose("dir-path: $dir\n");
-	#p_show("with filter: @::rm_files\n");
 	clean ($dir,$dcl::VERBOSE,@rm_filter);
 	print"Ok.\n" unless $dcl::QUIET;
 	if($dcl::EJECT || $dcl::UMOUNT){
