@@ -60,9 +60,11 @@ and OPTIONS are:
 ###examples
 
 ```
-$ dcl -vv -p -r .       #show verbose without deleting(--pretend option) files that would be deleted only in this dir  
+$ dcl -vv -p -r .       #show verbose without deleting(--pretend option) files that would be 
+                        #deleted only in this dir  
 
-$ dcl -s -u /mnt/Disk1     #clean /mnt/Disk1 recursively showing only deleted files.  
+$ dcl -s -u /mnt/Disk1      #clean /mnt/Disk1 recursively showing only deleted files 
+                            #and unmount the volume.  
 
 $ dcl /mnt/Disk2        #clean /mnt/Disk1 recursively. output almost nothing.(use -q for no output)
 ```
