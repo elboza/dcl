@@ -8,8 +8,8 @@ given a path **dcl** will clean this directory, and eventually subdirs, from a l
 ####config files
 you can customize the file list to be deleted by editing config files   
 `[/etc/dclrc , ~/.dclrc]`  
-or a custom file using the -f option. 
-default built-in filter list is always read unless you use the --override option.  
+or a custom file using the `-f` option. 
+default built-in filter list is always read unless you use the `--override` option.  
 the default built in list actually is  
 `[".DS_Store","._.DS_Store",".Spotlight-V100"]`  
 
