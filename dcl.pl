@@ -1,5 +1,9 @@
 #!/usr/bin/perl
 
+#dcl  D-cleaner
+#author: Fernando Iazeolla
+#licence: GPLv2
+
 use warnings;
 use Getopt::Long;
 use strict;
@@ -47,7 +51,7 @@ and OPTIONS are:
 --umount	-u		#unmount volume after cleaned.
 --override	-o		#exclude the default built-in file list
 --filelist	-f		#specity a custom file list
---norec		-r		#not recursive thru sub dirs
+--norec		-r		#not recursive across sub dirs
 --verbose	-vv		#verbose output
 --show		-s		#show matching files to be deleted
 --pretend	-p		#do not perform deletion.
@@ -256,7 +260,8 @@ sub main {
 	clean ($dir,$dcl::VERBOSE,@rm_filter);
 	print"Ok.\n" unless $dcl::QUIET;
 	if($dcl::EJECT || $dcl::UMOUNT){
-		print "umount && eject not yet coded... be patient :)\n" unless $dcl::QUIET;
+		#print "umount && eject not yet coded... be patient :)\n" unless $dcl::QUIET;
+		`umount $dir` || warn $!;
 	}
 	
 }
