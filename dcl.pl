@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-#dcl  D-cleaner
+#dcl  D-cleaner (Disk && Directory Cleaner)
 #author: Fernando Iazeolla
 #licence: GPLv2
 
@@ -23,7 +23,7 @@ package dcl;
 	$dcl::SHOW=0;
 	$dcl::ASK=0;
 	$dcl::FILTER=undef;
-	$dcl::LANG=$main::languages{regex};
+	$dcl::LANG=$main::languages{glob};
 	$dcl::QUIET=0;
 package main;
 
@@ -50,14 +50,14 @@ and OPTIONS are:
 --eject		-e		#eject volume after cleaned
 --umount	-u		#unmount volume after cleaned.
 --override	-o		#exclude the default built-in file list
---filelist	-f		#specity a custom file list
+--filelist <file>  -f <file>	#specify a custom file list
 --norec		-r		#not recursive across sub dirs
 --verbose	-vv		#verbose output
 --show		-s		#show matching files to be deleted
 --pretend	-p		#do not perform deletion.
---ask		-i [-a]	#ask confirmation before deleting each
---filter	-x		#define files filter to be deleted on command line. 
---lang [regex|glob] -l [regex|glob] #set parser language. (Default=regex).
+--ask		-i [-a]		#ask confirmation before deleting each
+--filter 'filter'  -x 'filter'	#define filter to be deleted on command line. 
+--lang [regex|glob] -l [regex|glob] #set parser language. (Default=glob)
 --quiet		-q		#quiet output.
 EOF
 
@@ -69,6 +69,9 @@ you can customize the file list to be deleted by editing config files
 [/etc/dclrc , ~/.dclrc] 
 or a custom file using the -f option. 
 default built-in filter list is always read unless you use the --override option.
+the default built in list actually is  
+[".DS_Store","._.DS_Store",".Spotlight-V100"]  
+
 
 dcl.rc example:
 	
@@ -202,14 +205,18 @@ sub clean{
 					next if($xx ne "y" && $xx ne "yes");
 				}
 				if(-d "$dir/$file"){
+					p_show(" ...queued to delete.\n");
+					p_verbose(" ...queued to delete.\n");
 					clean("$dir/$file",0,'\.*');
 					rmdir "$dir/$file";
+					p_show("++ $file/	<<<<  deleted.");
+					p_verbose("++ $file/	<<<<  deleted.");
 				}
 				else{
 					unlink "$dir/$file";
+					p_show(" deleted.");
+					p_verbose(" deleted.");
 				}
-				p_show(" deleted.");
-				p_verbose(" deleted.");
 			}
 			p_show("\n");
 		}
@@ -261,7 +268,7 @@ sub main {
 	print"Ok.\n" unless $dcl::QUIET;
 	if($dcl::EJECT || $dcl::UMOUNT){
 		#print "umount && eject not yet coded... be patient :)\n" unless $dcl::QUIET;
-		`umount $dir` || warn $!;
+		`umount "$dir"` ;
 	}
 	
 }
