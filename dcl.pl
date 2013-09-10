@@ -57,7 +57,7 @@ and OPTIONS are:
 --pretend	-p		#do not perform deletion.
 --ask		-i [-a]	#ask confirmation before deleting each
 --filter	-x		#define files filter to be deleted on command line. 
---lang [regex|glob] -l [regex|glob] #set parser language.
+--lang [regex|glob] -l [regex|glob] #set parser language. (Default=regex).
 --quiet		-q		#quiet output.
 EOF
 
