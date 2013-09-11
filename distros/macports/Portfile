@@ -1,0 +1,33 @@
+# $Id$
+
+PortSystem			1.0
+
+name				dcl
+version				0.1
+categories			sysutils
+platforms			darwin linux
+license				GPL-2+
+revision			1
+maintainers			gmail.com:fernando.iazeolla
+description			D-cleaner [ Disk && Directory Cleaner ]
+long_description	\
+		given a path **dcl** will clean this directory, and eventually subdirs, from a customazible \
+		list of files, and eventually unmount or eject the volume.
+					
+homepage            http://github.com/elboza/dcl
+master_sites        http://www.autistici.org/0xFE/software/releases/dcl
+
+checksums           md5    714b795868beefd09224ea57d182c6d1 \
+                    sha1    c7a7efec92dcd732cf5b8ac67d6ef6e7b04cfee0 \
+                    rmd160  ae20d9d0e9db0607b79b4e93bbac4893dc84046a
+
+worksrcdir			${name}
+use_configure		no
+
+build {}
+
+destroot {
+	xinstall -m 755 ${worksrcpath}/dcl.pl ${destroot}${prefix}/bin/dcl
+}
+
+
