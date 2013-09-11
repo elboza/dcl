@@ -9,7 +9,7 @@ platforms			darwin linux
 license				GPL-2+
 revision			1
 maintainers			gmail.com:fernando.iazeolla
-description			D-cleaner [ Disk && Directory Cleaner ]
+description			D-cleaner -- Disk && Directory Cleaner 
 long_description	\
 		given a path **dcl** will clean this directory, and eventually subdirs, from a customazible \
 		list of files, and eventually unmount or eject the volume.
