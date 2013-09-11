@@ -1,8 +1,9 @@
 #!/usr/bin/perl
 
-#dcl  D-cleaner (Disk && Directory Cleaner)
-#author: Fernando Iazeolla
-#licence: GPLv2
+# dcl  D-cleaner (Disk && Directory Cleaner)
+# author: Fernando Iazeolla
+# licence: GPLv2
+# web: http://github.com/elboza/dcl
 
 use warnings;
 use Getopt::Long;
