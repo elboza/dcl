@@ -80,9 +80,10 @@ $ dcl -x '*.o:*.c' /mnt/floppy  #clean all .c and all .o files from /mnt/floppy
 $ dcl -x '*.o,*.c' /mnt/floppy  #clean all .c and all .o files from /mnt/floppy
 ```
 
-######web
+#####web
 [dcl project page](http://github.com/elboza/dcl)
 
+####That's all falks
 
 ```
  _____
