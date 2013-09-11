@@ -77,6 +77,7 @@ the default built in list actually is
 dcl.rc example:
 	
 	%lang:glob 	#use glob syntax instead of regex
+			#declare a syntax is optional.
 	*.o		#all object files (glob syntax)
 	.DS_Dtore	#osx stuff !!
 	Makefile.in
@@ -268,8 +269,11 @@ sub main {
 	clean ($dir,$dcl::VERBOSE,@rm_filter);
 	print"Ok.\n" unless $dcl::QUIET;
 	if($dcl::EJECT || $dcl::UMOUNT){
-		#print "umount && eject not yet coded... be patient :)\n" unless $dcl::QUIET;
-		`umount "$dir"` ;
+		if(!$dcl::PRETEND){
+			#print "umount && eject not yet coded... be patient :)\n" unless $dcl::QUIET;
+			p_verbose("unmounting $dir\n");
+			`umount "$dir"` ;
+		}
 	}
 	
 }

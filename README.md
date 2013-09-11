@@ -16,6 +16,7 @@ the default built in list actually is
 ####dcl.rc example:
 	
 	%lang:glob     #use glob syntax instead of regex
+	#declare a syntax is optional.
 	*.o            #all object files (glob syntax)
 	.DS_Dtore      #osx stuff !!
 	Makefile.in
