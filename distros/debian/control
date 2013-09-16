@@ -1,0 +1,15 @@
+Source: dcl
+Section: utilities
+Priority: extra
+Maintainer: Fernando Iazeolla <xnando@yahoo.it>
+Build-Depends: debhelper (>= 8.0.0), perl
+Standards-Version: 3.9.4
+Homepage: http://github.com/elboza/dcl
+#Vcs-Git: git://git.debian.org/collab-maint/dcl.git
+#Vcs-Browser: http://git.debian.org/?p=collab-maint/dcl.git;a=summary
+
+Package: dcl
+Architecture: all
+Depends: ${misc:Depends}, perl
+Description: D-cleaner (Disk && Directory Cleaner)
+ given a path dcl will clean this directory, and eventually subdirs, from a list of files, and eventually unmount or eject the volume. For full documentation have a look at dcl website (http://github.com/elboza/dcl) or type 'dcl -h' in the command line.

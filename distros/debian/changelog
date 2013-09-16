@@ -1,0 +1,5 @@
+dcl (0.1-1) unstable; urgency=low
+
+  * Initial release (Closes: #nnnn)  <nnnn is the bug number of your ITP>
+
+ -- Fernando Iazeolla <xnando@yahoo.it>  Sun, 15 Sep 2013 23:21:52 +0200
