@@ -149,7 +149,7 @@ sub read_config_file{
 			}
 			else
 			{
-				warn("invalid parsing language declaration on config file. Using default.\n");
+				m_warn("invalid parsing language declaration on config file. Using default.\n");
 			}
 			next;
 		}
@@ -157,6 +157,13 @@ sub read_config_file{
 		
 	}
 	return @rm_files;
+}
+sub m_die{
+	print @_;
+	exit 1;
+}
+sub m_warn{
+	print @_;
 }
 sub p_verbose{
 	return if(!$dcl::VERBOSE);
@@ -244,8 +251,8 @@ sub main {
 		'filelist|f=s' => \$dcl::FILELIST,
 		'lang|l=s' => \$lang,
 		'quiet|q'=> \$dcl::QUIET
-		) or die ("Error in command line arguments");
-	$dir=shift @ARGV || die("ARGV error. dir-path missing.");
+		) or m_die "Error in command line arguments. Try 'dcl --help' .\n";
+	$dir=shift @ARGV || m_die("ARGV error. dir-path missing. Try 'dcl --help' .\n");
 	$dcl::SHOW=0 if($dcl::VERBOSE);  #show is a subset of verbose.
 	if($dcl::QUIET){$dcl::SHOW=0;$dcl::VERBOSE=0;}	#quiet wins !
 	@rm_filter=@::rm_files if(!$dcl::OVERRIDE);
@@ -259,7 +266,7 @@ sub main {
 		}
 		else
 		{
-			warn("invalid language type. Using default.\n");
+			m_warn("invalid language type. Using default.\n");
 		}
 	}
 	if($dcl::FILTER){
