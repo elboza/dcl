@@ -17,9 +17,9 @@ long_description	\
 homepage            http://github.com/elboza/dcl
 master_sites        http://www.autistici.org/0xFE/software/releases/dcl
 
-checksums           md5    043a8666a8f13daceb34d434171f0694 \
-                    sha1    882468c203a006cd9038fa0d7d63a7ee6fe284cc \
-                    rmd160  e6f9a034eec1441a28b592449a449c59fcb96623
+checksums           md5    2dc4ee1f86c683508800df686b1f6cdc \
+                    sha1    0e48c7e2ea652f9ebe54b1a0fafba56d7b13ee39 \
+                    rmd160  cd293553eac6d87d1705dc7f3c9682e5387d4051
 
 worksrcdir			${name}
 use_configure		no
