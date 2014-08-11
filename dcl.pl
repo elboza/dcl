@@ -48,7 +48,7 @@ and OPTIONS are:
 --help		-h		#show this help
 --help config	-h config	#show help about .dclrc config file(s)
 --version	-v		#show program version
---eject		-e		#eject volume after cleaned
+--eject		-e		#eject volume after cleaned (OS X only)
 --umount	-u		#unmount volume after cleaned.
 --override	-o		#exclude the default built-in file list
 --filelist <file>  -f <file>	#specify a custom file list
@@ -272,17 +272,24 @@ sub main {
 	if($dcl::FILTER){
 		push @rm_filter,lang_filter(split /[ :,;]/,$dcl::FILTER) ;
 	}
+	print scalar localtime,"\n";
 	p_verbose("dir-path: $dir\n");
 	clean ($dir,$dcl::VERBOSE,@rm_filter);
 	print"Ok.\n" unless $dcl::QUIET;
-	if($dcl::EJECT || $dcl::UMOUNT){
+	if($dcl::UMOUNT){
 		if(!$dcl::PRETEND){
 			#print "umount && eject not yet coded... be patient :)\n" unless $dcl::QUIET;
 			p_verbose("unmounting $dir\n");
 			`umount "$dir"` ;
 		}
+	}	
+	if($dcl::EJECT){
+		if(!$dcl::PRETEND){
+			#print "umount && eject not yet coded... be patient :)\n" unless $dcl::QUIET;
+			p_verbose("ejecting $dir\n");
+			`diskutil eject "$dir"` ;
+		}
 	}
-	
 }
 
 main;
