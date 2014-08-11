@@ -294,3 +294,112 @@ sub main {
 
 main;
 
+__END__
+
+=pod
+
+=head1 NAME
+
+dcl - D-Cleaner (Disk & Directory Cleaner)
+
+=head1 SYNOPSIS
+
+B<dcl [OPTIONS] PATH>
+
+=head1 DESCRIPTION
+
+given a path, B<dcl> will clean this directory, and eventually subdirs, from a list of files, and eventually unmount or eject the volume.
+
+=head1 OPTIONS
+
+--help      -h      #show this help
+
+--help config   -h config   #show help about .dclrc config file(s)
+
+--version   -v      #show program version
+
+--eject     -e      #eject volume after cleaned (OS X only)
+
+--umount    -u      #unmount volume after cleaned.
+
+--override  -o      #exclude the default built-in file list
+
+--filelist <file>  -f <file>    #specify a custom file list
+
+--norec     -r      #not recursive across sub dirs
+
+--verbose   -vv     #verbose output
+
+--show      -s      #show matching files to be deleted
+
+--pretend   -p      #do not perform deletion.
+
+--ask       -i [-a]     #ask confirmation before deleting each
+
+--filter 'filter'  -x 'filter'  #define filter to be deleted on command line. 
+
+--lang [regex|glob] -l [regex|glob] #set parser language. (Default=glob)
+
+--quiet     -q      #quiet output.
+
+=head1 CONFIG
+
+you can customize the file list to be deleted by editing config files 
+[/etc/dclrc , ~/.dclrc] 
+or a custom file using the -f option. 
+default built-in filter list is always read unless you use the --override option.
+the default built in list actually is  
+[".DS_Store","._.DS_Store",".Spotlight-V100"]  
+
+
+dcl.rc example:
+    
+	%lang:glob  #use glob syntax instead of regex
+	            #declare a syntax is optional.
+	*.o         #all object files (glob syntax)
+	.DS_Dtore   #osx stuff !!
+	Makefile.in
+	            #this is a comment
+
+=head1 EXAMPLES
+
+$ dcl -vv -p -r .       #show verbose without deleting(--pretend option) files that otherwise would deleted, only in this dir (-r).  
+
+$ dcl -s -u /mnt/Disk1      #clean /mnt/Disk1 recursively showing only deleted files and unmount the volume.  
+
+$ dcl /mnt/Disk2        #clean /mnt/Disk1 recursively. output almost nothing.(use -q for no output)
+
+
+#these perform the same:
+$ dcl -x '*.o *.c' /mnt/floppy  #clean all .c and all .o files from /mnt/floppy
+
+$ dcl -x '*.o;*.c' /mnt/floppy  #clean all .c and all .o files from /mnt/floppy
+
+$ dcl -x '*.o:*.c' /mnt/floppy  #clean all .c and all .o files from /mnt/floppy
+
+$ dcl -x '*.o,*.c' /mnt/floppy  #clean all .c and all .o files from /mnt/floppy
+
+=head1 SEE ALSO
+
+L<http://www.github.com/elboza/dcl>
+
+=head1 AUTHOR
+
+Fernando Iazeolla - elboza
+
+=head1 COPYRIGHT
+
+this software is distributed under L-BEERWARE (Lesser Beerware) license:
+
++---------------------------------------------------------------+
+
+the L-BEERWARE License. (Revision 1). 
+The author takes no responsability about the use and the effects that this software may produce.
+As long as you retain this notice you can do whatever you want with this stuff. If we meet some day, and you think this stuff is worth it, you can buy the author a beer in return.
+
++---------------------------------------------------------------+
+
+
+
+=cut
+
