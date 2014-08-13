@@ -391,14 +391,17 @@ Fernando Iazeolla - elboza
 
 this software is distributed under L-BEERWARE (Lesser Beerware) license:
 
-+---------------------------------------------------------------+
-
-the L-BEERWARE License. (Revision 1). 
-The author takes no responsability about the use and the effects that this software may produce.
-As long as you retain this notice you can do whatever you want with this stuff. If we meet some day, and you think this stuff is worth it, you can buy the author a beer in return.
-
-+---------------------------------------------------------------+
-
+/*
+ * ----------------------------------------------------------------------------
+ * "THE L-BEERWARE LICENSE" (Revision 1):
+ * The author takes no responsability about the use and the effects that 
+ * this software may produce.
+ * As long as you retain this notice you can do whatever you want with this
+ * stuff.
+ * If we meet some day, and you think this stuff is worth it, you can 
+ * buy the author a beer in return.
+ * ----------------------------------------------------------------------------
+ */
 
 
 =cut
