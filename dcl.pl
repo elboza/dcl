@@ -13,11 +13,12 @@ use strict;
 
 %::languages=(regex=>"regex",glob=>"glob");
 package dcl;
-	$dcl::VERSION="0.1";
+	$dcl::VERSION="0.2";
 	$dcl::VERBOSE=0;
 	$dcl::EJECT=0;
 	$dcl::UMOUNT=0;
 	$dcl::OVERRIDE=0;
+	$dcl::NORC=0;
 	$dcl::FILELIST=undef;
 	$dcl::NOREC=0;
 	$dcl::PRETEND=0;
@@ -51,6 +52,7 @@ and OPTIONS are:
 --eject		-e		#eject volume after cleaned (OS X only)
 --umount	-u		#unmount volume after cleaned.
 --override	-o		#exclude the default built-in file list
+--norc		-z		#override dcl.rc config files
 --filelist <file>  -f <file>	#specify a custom file list
 --norec		-r		#not recursive across sub dirs
 --verbose	-vv		#verbose output
@@ -165,6 +167,12 @@ sub m_die{
 sub m_warn{
 	print @_;
 }
+sub print_filter{
+	foreach my $x (@_){
+		print $x," ";
+	}
+	print "\n";
+}
 sub p_verbose{
 	return if(!$dcl::VERBOSE);
 	print @_ ;
@@ -244,6 +252,7 @@ sub main {
 		'ask|a|i' => \$dcl::ASK,
 		'pretend|p' => \$dcl::PRETEND,
 		'override|O' => \$dcl::OVERRIDE,
+		'norc|z' => \$dcl::NORC,
 		'norec|R' => \$dcl::NOREC,
 		'eject|e' => \$dcl::EJECT,
 		'umount|u' => \$dcl::UMOUNT,
@@ -256,8 +265,10 @@ sub main {
 	$dcl::SHOW=0 if($dcl::VERBOSE);  #show is a subset of verbose.
 	if($dcl::QUIET){$dcl::SHOW=0;$dcl::VERBOSE=0;}	#quiet wins !
 	@rm_filter=@::rm_files if(!$dcl::OVERRIDE);
-	foreach  (@::config_file_list) {
-		push @rm_filter,lang_filter(read_config_file($_));
+	if(!$dcl::NORC){
+		foreach  (@::config_file_list) {
+			push @rm_filter,lang_filter(read_config_file($_));
+		}
 	}
 	push @rm_filter,lang_filter(read_config_file($dcl::FILELIST)) if($dcl::FILELIST);
 	if($lang){	#last word at command line !
@@ -272,7 +283,10 @@ sub main {
 	if($dcl::FILTER){
 		push @rm_filter,lang_filter(split /[ :,;]/,$dcl::FILTER) ;
 	}
-	print scalar localtime,"\n";
+	if($dcl::SHOW || $dcl::VERBOSE){
+		print scalar localtime,"\n";
+		print_filter @rm_filter;
+	}
 	p_verbose("dir-path: $dir\n");
 	clean ($dir,$dcl::VERBOSE,@rm_filter);
 	print"Ok.\n" unless $dcl::QUIET;
@@ -323,6 +337,8 @@ given a path, B<dcl> will clean this directory, and eventually subdirs, from a l
 --umount    -u      #unmount volume after cleaned.
 
 --override  -o      #exclude the default built-in file list
+
+--norc		-z		#override dcl.rc config files
 
 --filelist <file>  -f <file>    #specify a custom file list
 
