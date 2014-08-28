@@ -127,7 +127,14 @@ sub lang_filter{
 		$regex="^$regex\$";
 		push @filtered_list,$regex;
 	}
+	#print join(", ", @filtered_list);
 	return @filtered_list;
+}
+sub filter_space{
+	my $file=shift @_;
+	$file=~s/\s/\\ /g;
+	$file=~s/\\+/\\/g;
+	return $file;
 }
 sub read_config_file{
 	my $cfg_file=shift @_;
@@ -264,13 +271,13 @@ sub main {
 	$dir=shift @ARGV || m_die("ARGV error. dir-path missing. Try 'dcl --help' .\n");
 	$dcl::SHOW=0 if($dcl::VERBOSE);  #show is a subset of verbose.
 	if($dcl::QUIET){$dcl::SHOW=0;$dcl::VERBOSE=0;}	#quiet wins !
-	@rm_filter=@::rm_files if(!$dcl::OVERRIDE);
+	@rm_filter=lang_filter(@::rm_files) if(!$dcl::OVERRIDE);
 	if(!$dcl::NORC){
 		foreach  (@::config_file_list) {
 			push @rm_filter,lang_filter(read_config_file($_));
 		}
 	}
-	push @rm_filter,lang_filter(read_config_file($dcl::FILELIST)) if($dcl::FILELIST);
+	push @rm_filter,lang_filter(read_config_file(filter_space($dcl::FILELIST))) if($dcl::FILELIST);
 	if($lang){	#last word at command line !
 		if($lang eq $::languages{regex} || $lang eq $::languages{glob}){
 				$dcl::LANG=$lang;
