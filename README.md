@@ -11,7 +11,7 @@ you can customize the file list to be deleted by editing config files
 or a custom file using the `-f` option. 
 default built-in filter list is always read unless you use the `--override` option.  
 the default built in list actually is  
-`[".DS_Store","._.DS_Store",".Spotlight-V100"]`  
+`[".DS_Store","._*",".Spotlight*",".Trash*",".fseventsd"]`  
 
 ####dcl.rc example:
 	
@@ -19,10 +19,18 @@ the default built in list actually is
 	#declare a syntax is optional.
 	*.o            #all object files (glob syntax)
 	.DS_Dtore      #osx stuff !!
-	Makefile.in
+	thumbs.db
 	#this is a comment
 
 ##install
+
+to see install options:
+
+```
+make help
+```
+
+to install:
 
 ```
 sudo make install

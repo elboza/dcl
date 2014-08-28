@@ -10,7 +10,7 @@ SHELL=/bin/bash
 
 all: help
 
-.PHONY: clean install uninstall dist
+.PHONY: clean install uninstall dist man
 
 install:
 	mkdir -p ${DESTDIR}${BINDIR}
@@ -46,4 +46,9 @@ help:
 	@ echo "uninstall - uninstall everything"
 	@ echo "clean     - remove any temporary files"
 	@ echo "dist      - make a dist .tar.gz tarball package"
+	@ echo "man       - make dcl.man from dcl.pl"
+
+man:
+	perldoc -o man -d man/dcl.man dcl.pl
+
 

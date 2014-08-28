@@ -30,7 +30,7 @@ package dcl;
 package main;
 
 #@rm_files=(".DS_Store","._.DS_Store",".Spotlight-V100","foobar.dcl",'\.o$'); ##EXAMPLE
-@::rm_files=(".DS_Store","._.DS_Store",".Spotlight-V100");
+@::rm_files=(".DS_Store","._*",".Spotlight*",".Trash*",".fseventsd");
 @::config_file_list=("/etc/dclrc","~/.dclrc");
 
 sub show_version{
@@ -73,7 +73,7 @@ you can customize the file list to be deleted by editing config files
 or a custom file using the -f option. 
 default built-in filter list is always read unless you use the --override option.
 the default built in list actually is  
-[".DS_Store","._.DS_Store",".Spotlight-V100"]  
+[".DS_Store","._*",".Spotlight*",".Trash*",".fseventsd"]  
 
 
 dcl.rc example:
@@ -82,7 +82,7 @@ dcl.rc example:
 			#declare a syntax is optional.
 	*.o		#all object files (glob syntax)
 	.DS_Dtore	#osx stuff !!
-	Makefile.in
+	thumbs.db
 	#this is a comment
 
 EOF
@@ -365,7 +365,7 @@ you can customize the file list to be deleted by editing config files
 or a custom file using the -f option. 
 default built-in filter list is always read unless you use the --override option.
 the default built in list actually is  
-[".DS_Store","._.DS_Store",".Spotlight-V100"]  
+[".DS_Store","._*",".Spotlight*",".Trash*",".fseventsd"]  
 
 
 dcl.rc example:
@@ -374,7 +374,7 @@ dcl.rc example:
 	            #declare a syntax is optional.
 	*.o         #all object files (glob syntax)
 	.DS_Dtore   #osx stuff !!
-	Makefile.in
+	thumbs.db
 	            #this is a comment
 
 =head1 EXAMPLES
@@ -405,19 +405,7 @@ Fernando Iazeolla - elboza
 
 =head1 COPYRIGHT
 
-this software is distributed under L-BEERWARE (Lesser Beerware) license:
-
-/*
- * ----------------------------------------------------------------------------
- * "THE L-BEERWARE LICENSE" (Revision 1):
- * The author takes no responsability about the use and the effects that 
- * this software may produce.
- * As long as you retain this notice you can do whatever you want with this
- * stuff.
- * If we meet some day, and you think this stuff is worth it, you can 
- * buy the author a beer in return.
- * ----------------------------------------------------------------------------
- */
+this software is distributed under GPLv2 license:
 
 
 =cut
