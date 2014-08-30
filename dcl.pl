@@ -201,7 +201,8 @@ sub clean{
 			clean ($subdir,$dcl::VERBOSE,@rm_files);
 		}
 	}
-	my $str=">> in dir: $dir #with @rm_files\n";
+	#my $str=">> in dir: $dir #with @rm_files\n";
+	my $str=">> in dir: $dir\n";
 	p_verbose($str);
 	my $count=0;
 	foreach my $file (@files) {
