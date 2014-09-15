@@ -144,7 +144,7 @@ sub read_config_file{
 	my $ll="";
 	return @rm_files if( ! -e $xfile );
 	print "CFG: $xfile\n" if($dcl::VERBOSE);
-	open FD,"<$xfile" or return @rm_files;
+	open FD,'<',$xfile or return @rm_files;
 	my @lines=<FD>;
 	close FD;
 	foreach $ll (@lines){
@@ -152,6 +152,7 @@ sub read_config_file{
 		next if($ll=~/^\n/);
 		$ll=~ s/#.*\n$//g;
 		$ll=~ s/[\s\n\r\t]+//g;
+		next if($ll=~/^$/);
 		if($ll=~/^%lang:/){
 			if($' eq $::languages{regex} || $' eq $::languages{glob}){
 				$dcl::LANG=$';
